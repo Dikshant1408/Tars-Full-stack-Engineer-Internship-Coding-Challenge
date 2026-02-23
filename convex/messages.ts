@@ -1,6 +1,31 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+export const markAsRead = mutation({
+  args: {
+    conversationId: v.id("conversations"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("lastRead")
+      .withIndex("by_userId_conversationId", (q) =>
+        q.eq("userId", args.userId).eq("conversationId", args.conversationId)
+      )
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { lastReadAt: Date.now() });
+    } else {
+      await ctx.db.insert("lastRead", {
+        conversationId: args.conversationId,
+        userId: args.userId,
+        lastReadAt: Date.now(),
+      });
+    }
+  },
+});
+
 export const send = mutation({
   args: {
     conversationId: v.id("conversations"),

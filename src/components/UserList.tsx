@@ -63,14 +63,23 @@ export function UserList({ currentUser }: UserListProps) {
             onClick={() => handleStartConversation(u)}
             className="flex w-full items-center gap-3 rounded-md p-3 text-left transition-colors hover:bg-accent"
           >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={u.imageUrl} />
-              <AvatarFallback>{initials(u)}</AvatarFallback>
-            </Avatar>
+            <div className="relative shrink-0">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={u.imageUrl} />
+                <AvatarFallback>{initials(u)}</AvatarFallback>
+              </Avatar>
+              {u.isOnline && (
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-green-500" />
+              )}
+            </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{displayName(u)}</p>
               <p className="truncate text-xs text-muted-foreground">
-                {u.email}
+                {u.isOnline ? (
+                  <span className="text-green-500">Online</span>
+                ) : (
+                  u.email
+                )}
               </p>
             </div>
           </button>

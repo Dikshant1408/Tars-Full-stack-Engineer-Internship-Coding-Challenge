@@ -35,7 +35,7 @@ export function ChatSidebar({
     (u.name || u.email)[0].toUpperCase();
 
   return (
-    <div className="flex w-72 flex-col border-r bg-card">
+    <div className="flex h-full w-full flex-col md:w-72">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <h1 className="text-lg font-bold">{APP_NAME}</h1>
@@ -78,32 +78,53 @@ export function ChatSidebar({
         {tab === "conversations" ? (
           <div className="flex flex-col gap-0.5 p-2">
             {conversations === undefined ? (
-              <p className="p-3 text-sm text-muted-foreground">Loading...</p>
+              <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground">
+                <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                <p className="text-sm">Loading conversations…</p>
+              </div>
             ) : conversations.length === 0 ? (
-              <p className="p-3 text-sm text-muted-foreground">
-                No conversations yet. Start one from People tab!
-              </p>
+              <div className="flex flex-col items-center gap-2 p-6 text-center text-muted-foreground">
+                <MessageSquare className="h-10 w-10 opacity-30" />
+                <p className="text-sm font-medium">No conversations yet</p>
+                <p className="text-xs">Start one from the People tab!</p>
+              </div>
             ) : (
               conversations.map((conv) => {
                 if (!conv.otherUser) return null;
+                const isActive = activeConversationId === conv._id;
+                const hasUnread = (conv.unreadCount ?? 0) > 0;
                 return (
                   <button
                     key={conv._id}
                     onClick={() => router.push(`/chat/${conv._id}`)}
                     className={cn(
                       "flex w-full items-center gap-3 rounded-md p-3 text-left transition-colors hover:bg-accent",
-                      activeConversationId === conv._id && "bg-accent"
+                      isActive && "bg-accent"
                     )}
                   >
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={conv.otherUser.imageUrl} />
-                      <AvatarFallback>
-                        {initials(conv.otherUser)}
-                      </AvatarFallback>
-                    </Avatar>
+                    {/* Avatar with online dot */}
+                    <div className="relative shrink-0">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={conv.otherUser.imageUrl} />
+                        <AvatarFallback>
+                          {initials(conv.otherUser)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {conv.otherUser.isOnline && (
+                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-green-500" />
+                      )}
+                    </div>
+
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-1">
-                        <p className="truncate text-sm font-medium">
+                        <p
+                          className={cn(
+                            "truncate text-sm",
+                            hasUnread && !isActive
+                              ? "font-semibold"
+                              : "font-medium"
+                          )}
+                        >
                           {displayName(conv.otherUser)}
                         </p>
                         {conv.lastMessage && (
@@ -112,11 +133,31 @@ export function ChatSidebar({
                           </span>
                         )}
                       </div>
-                      {conv.lastMessage && (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {conv.lastMessage.body}
-                        </p>
-                      )}
+                      <div className="flex items-center justify-between gap-1">
+                        {conv.lastMessage ? (
+                          <p
+                            className={cn(
+                              "truncate text-xs",
+                              hasUnread && !isActive
+                                ? "font-medium text-foreground"
+                                : "text-muted-foreground"
+                            )}
+                          >
+                            {conv.lastMessage.body}
+                          </p>
+                        ) : (
+                          <p className="truncate text-xs text-muted-foreground">
+                            No messages yet
+                          </p>
+                        )}
+                        {hasUnread && !isActive && (
+                          <span className="ml-1 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                            {(conv.unreadCount ?? 0) > 99
+                              ? "99+"
+                              : conv.unreadCount}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </button>
                 );

@@ -7,6 +7,8 @@ import { ChatSidebar } from "./ChatSidebar";
 import { ChatWindow } from "./ChatWindow";
 import { Id } from "../../../convex/_generated/dataModel";
 import { APP_NAME } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+import { MessageSquare } from "lucide-react";
 
 interface ChatLayoutProps {
   conversationId?: string;
@@ -29,11 +31,26 @@ export function ChatLayout({ conversationId }: ChatLayoutProps) {
 
   return (
     <div className="flex h-screen bg-background">
-      <ChatSidebar
-        currentUser={currentUser}
-        activeConversationId={conversationId as Id<"conversations"> | undefined}
-      />
-      <div className="flex flex-1 flex-col">
+      {/* Sidebar: full-width on mobile when no conversation, fixed width on md+ */}
+      <div
+        className={cn(
+          "flex-col border-r bg-card md:flex md:w-72",
+          conversationId ? "hidden md:flex" : "flex w-full"
+        )}
+      >
+        <ChatSidebar
+          currentUser={currentUser}
+          activeConversationId={conversationId as Id<"conversations"> | undefined}
+        />
+      </div>
+
+      {/* Chat area: hidden on mobile when no conversation */}
+      <div
+        className={cn(
+          "flex flex-1 flex-col",
+          !conversationId && "hidden md:flex"
+        )}
+      >
         {conversationId ? (
           <ChatWindow
             conversationId={conversationId as Id<"conversations">}
@@ -42,6 +59,7 @@ export function ChatLayout({ conversationId }: ChatLayoutProps) {
         ) : (
           <div className="flex flex-1 items-center justify-center text-muted-foreground">
             <div className="text-center">
+              <MessageSquare className="mx-auto mb-3 h-12 w-12 opacity-20" />
               <p className="text-xl font-semibold">Welcome to {APP_NAME}</p>
               <p className="mt-2 text-sm">
                 Select a conversation or start a new one
