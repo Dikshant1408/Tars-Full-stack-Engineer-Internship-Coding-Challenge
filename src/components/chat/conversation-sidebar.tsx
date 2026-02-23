@@ -43,17 +43,10 @@ export function ConversationSidebar({
     router.push(`/chat/${convId}`);
   };
 
-  const displayName = (u: Doc<"users">) =>
-    u.firstName && u.lastName
-      ? `${u.firstName} ${u.lastName}`
-      : u.username ?? u.email;
+  const displayName = (u: Doc<"users">) => u.name || u.email;
 
-  const initials = (u: Doc<"users">) => {
-    if (u.firstName && u.lastName) {
-      return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
-    }
-    return (u.username ?? u.email)[0].toUpperCase();
-  };
+  const initials = (u: Doc<"users">) =>
+    (u.name || u.email)[0].toUpperCase();
 
   return (
     <div className="flex w-72 flex-col border-r bg-card">
@@ -126,7 +119,7 @@ export function ConversationSidebar({
                       </p>
                       {conv.lastMessage && (
                         <p className="truncate text-xs text-muted-foreground">
-                          {conv.lastMessage.content}
+                          {conv.lastMessage.body}
                         </p>
                       )}
                     </div>

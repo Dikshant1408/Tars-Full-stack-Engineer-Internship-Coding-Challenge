@@ -24,17 +24,10 @@ export function MessagePanel({
   const currentConv = conversation?.find((c) => c._id === conversationId);
   const otherUser = currentConv?.otherUser;
 
-  const displayName = (u: Doc<"users">) =>
-    u.firstName && u.lastName
-      ? `${u.firstName} ${u.lastName}`
-      : u.username ?? u.email;
+  const displayName = (u: Doc<"users">) => u.name || u.email;
 
-  const initials = (u: Doc<"users">) => {
-    if (u.firstName && u.lastName) {
-      return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
-    }
-    return (u.username ?? u.email)[0].toUpperCase();
-  };
+  const initials = (u: Doc<"users">) =>
+    (u.name || u.email)[0].toUpperCase();
 
   return (
     <div className="flex h-full flex-col">

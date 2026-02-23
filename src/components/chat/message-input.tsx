@@ -13,16 +13,16 @@ interface MessageInputProps {
 }
 
 export function MessageInput({ conversationId, senderId }: MessageInputProps) {
-  const [content, setContent] = useState("");
+  const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const sendMessage = useMutation(api.messages.send);
 
   const handleSend = async () => {
-    if (!content.trim() || sending) return;
+    if (!body.trim() || sending) return;
     setSending(true);
     try {
-      await sendMessage({ conversationId, senderId, content: content.trim() });
-      setContent("");
+      await sendMessage({ conversationId, senderId, body: body.trim() });
+      setBody("");
     } catch (e) {
       console.error(e);
     } finally {
@@ -40,8 +40,8 @@ export function MessageInput({ conversationId, senderId }: MessageInputProps) {
   return (
     <div className="flex items-end gap-2 border-t p-4">
       <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message... (Enter to send, Shift+Enter for newline)"
         rows={1}
@@ -50,7 +50,7 @@ export function MessageInput({ conversationId, senderId }: MessageInputProps) {
       />
       <Button
         onClick={handleSend}
-        disabled={!content.trim() || sending}
+        disabled={!body.trim() || sending}
         size="icon"
         className="shrink-0"
       >

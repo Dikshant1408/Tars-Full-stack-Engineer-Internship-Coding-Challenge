@@ -4,27 +4,27 @@ import { v } from "convex/values";
 export default defineSchema({
   users: defineTable({
     clerkId: v.string(),
+    name: v.string(),
     email: v.string(),
-    firstName: v.optional(v.string()),
-    lastName: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
-    username: v.optional(v.string()),
+    isOnline: v.boolean(),
+    lastSeen: v.number(),
   })
     .index("by_clerkId", ["clerkId"])
     .index("by_email", ["email"]),
 
   conversations: defineTable({
-    participantOne: v.id("users"),
-    participantTwo: v.id("users"),
-    lastMessageTime: v.number(),
-  })
-    .index("by_participantOne", ["participantOne"])
-    .index("by_participantTwo", ["participantTwo"]),
+    members: v.array(v.id("users")),
+    isGroup: v.boolean(),
+    groupName: v.optional(v.string()),
+    createdAt: v.number(),
+  }),
 
   messages: defineTable({
     conversationId: v.id("conversations"),
     senderId: v.id("users"),
-    content: v.string(),
+    body: v.string(),
     createdAt: v.number(),
+    isDeleted: v.boolean(),
   }).index("by_conversationId", ["conversationId"]),
 });

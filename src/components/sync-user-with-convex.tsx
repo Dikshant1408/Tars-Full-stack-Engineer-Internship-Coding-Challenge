@@ -12,13 +12,18 @@ export function SyncUserWithConvex() {
   useEffect(() => {
     if (!isLoaded || !user) return;
 
+    const name =
+      (user.fullName && user.fullName.trim()) ||
+      `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() ||
+      user.username ||
+      user.primaryEmailAddress?.emailAddress ||
+      "";
+
     upsertUser({
       clerkId: user.id,
+      name,
       email: user.primaryEmailAddress?.emailAddress ?? "",
-      firstName: user.firstName ?? undefined,
-      lastName: user.lastName ?? undefined,
       imageUrl: user.imageUrl ?? undefined,
-      username: user.username ?? undefined,
     }).catch((err) => console.error("Failed to sync user with Convex:", err));
   }, [isLoaded, user, upsertUser]);
 

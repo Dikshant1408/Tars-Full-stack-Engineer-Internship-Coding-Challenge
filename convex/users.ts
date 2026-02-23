@@ -4,11 +4,9 @@ import { mutation, query } from "./_generated/server";
 export const upsertFromClerk = mutation({
   args: {
     clerkId: v.string(),
+    name: v.string(),
     email: v.string(),
-    firstName: v.optional(v.string()),
-    lastName: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
-    username: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -18,22 +16,36 @@ export const upsertFromClerk = mutation({
 
     if (existing) {
       await ctx.db.patch(existing._id, {
+        name: args.name,
         email: args.email,
-        firstName: args.firstName,
-        lastName: args.lastName,
         imageUrl: args.imageUrl,
-        username: args.username,
+        lastSeen: Date.now(),
       });
       return existing._id;
     }
 
     return await ctx.db.insert("users", {
       clerkId: args.clerkId,
+      name: args.name,
       email: args.email,
-      firstName: args.firstName,
-      lastName: args.lastName,
       imageUrl: args.imageUrl,
-      username: args.username,
+      isOnline: false,
+      lastSeen: Date.now(),
+    });
+  },
+});
+
+export const setOnlineStatus = mutation({
+  args: { clerkId: v.string(), isOnline: v.boolean() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+    if (!user) return;
+    await ctx.db.patch(user._id, {
+      isOnline: args.isOnline,
+      lastSeen: Date.now(),
     });
   },
 });

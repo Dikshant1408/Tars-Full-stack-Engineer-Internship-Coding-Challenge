@@ -5,21 +5,16 @@ export const send = mutation({
   args: {
     conversationId: v.id("conversations"),
     senderId: v.id("users"),
-    content: v.string(),
+    body: v.string(),
   },
   handler: async (ctx, args) => {
-    const messageId = await ctx.db.insert("messages", {
+    return await ctx.db.insert("messages", {
       conversationId: args.conversationId,
       senderId: args.senderId,
-      content: args.content,
+      body: args.body,
       createdAt: Date.now(),
+      isDeleted: false,
     });
-
-    await ctx.db.patch(args.conversationId, {
-      lastMessageTime: Date.now(),
-    });
-
-    return messageId;
   },
 });
 

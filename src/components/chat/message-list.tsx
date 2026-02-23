@@ -43,11 +43,7 @@ export function MessageList({
           messages.map((msg) => {
             const isOwn = msg.senderId === currentUserId;
             const senderInitial = msg.sender
-              ? (
-                  msg.sender.firstName?.[0] ??
-                  msg.sender.username?.[0] ??
-                  msg.sender.email[0]
-                ).toUpperCase()
+              ? (msg.sender.name || msg.sender.email)[0].toUpperCase()
               : "?";
 
             return (
@@ -74,7 +70,7 @@ export function MessageList({
                       : "rounded-bl-sm bg-muted text-foreground"
                   )}
                 >
-                  {msg.content}
+                  {msg.body}
                 </div>
               </div>
             );
