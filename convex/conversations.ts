@@ -42,7 +42,27 @@ export const listForUser = query({
           )
           .order("desc")
           .first();
-        return { ...conv, otherUser, lastMessage: lastMsg };
+        const lastRead = await ctx.db
+          .query("lastRead")
+          .withIndex("by_userId_conversationId", (q) =>
+            q.eq("userId", args.userId).eq("conversationId", conv._id)
+          )
+          .unique();
+        const lastReadAt = lastRead?.lastReadAt ?? 0;
+
+        const allMsgs = await ctx.db
+          .query("messages")
+          .withIndex("by_conversationId_createdAt", (q) =>
+            q
+              .eq("conversationId", conv._id)
+              .gt("createdAt", lastReadAt)
+          )
+          .collect();
+        const unreadCount = allMsgs.filter(
+          (m) => m.senderId !== args.userId
+        ).length;
+
+        return { ...conv, otherUser, lastMessage: lastMsg, unreadCount };
       })
     );
   },

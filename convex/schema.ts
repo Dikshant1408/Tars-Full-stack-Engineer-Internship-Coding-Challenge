@@ -26,5 +26,21 @@ export default defineSchema({
     body: v.string(),
     createdAt: v.number(),
     isDeleted: v.boolean(),
-  }).index("by_conversationId", ["conversationId"]),
+  })
+    .index("by_conversationId", ["conversationId"])
+    .index("by_conversationId_createdAt", ["conversationId", "createdAt"]),
+
+  typing: defineTable({
+    conversationId: v.id("conversations"),
+    userId: v.id("users"),
+    updatedAt: v.number(),
+  })
+    .index("by_conversationId", ["conversationId"])
+    .index("by_userId_conversationId", ["userId", "conversationId"]),
+
+  lastRead: defineTable({
+    conversationId: v.id("conversations"),
+    userId: v.id("users"),
+    lastReadAt: v.number(),
+  }).index("by_userId_conversationId", ["userId", "conversationId"]),
 });

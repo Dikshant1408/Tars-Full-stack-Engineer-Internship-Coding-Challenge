@@ -3,7 +3,7 @@
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 
@@ -16,9 +16,44 @@ export function MessageInput({ conversationId, senderId }: MessageInputProps) {
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const sendMessage = useMutation(api.messages.send);
+  const setTyping = useMutation(api.typing.setTyping);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear typing indicator on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      setTyping({ conversationId, userId: senderId, isTyping: false }).catch(
+        () => {}
+      );
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, senderId]);
+
+  const stopTyping = useCallback(() => {
+    setTyping({ conversationId, userId: senderId, isTyping: false }).catch(
+      () => {}
+    );
+  }, [conversationId, senderId, setTyping]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBody(e.target.value);
+
+    // Emit typing indicator
+    setTyping({ conversationId, userId: senderId, isTyping: true }).catch(
+      () => {}
+    );
+
+    // Auto-stop typing after 2.5s of no input
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(stopTyping, 2500);
+  };
 
   const handleSend = async () => {
     if (!body.trim() || sending) return;
+    // Clear typing indicator immediately on send
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    stopTyping();
     setSending(true);
     try {
       await sendMessage({ conversationId, senderId, body: body.trim() });
@@ -38,10 +73,10 @@ export function MessageInput({ conversationId, senderId }: MessageInputProps) {
   };
 
   return (
-    <div className="flex items-end gap-2 border-t p-4">
+    <div className="flex items-end gap-2 border-t p-3 md:p-4">
       <textarea
         value={body}
-        onChange={(e) => setBody(e.target.value)}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
         rows={1}
