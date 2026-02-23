@@ -6,13 +6,22 @@ import { useAuth } from "@clerk/nextjs";
 import { ReactNode, useState } from "react";
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
-  const [convex] = useState(() => {
-    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-    if (!convexUrl) {
-      throw new Error("NEXT_PUBLIC_CONVEX_URL environment variable is not set");
-    }
-    return new ConvexReactClient(convexUrl);
-  });
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  const [convex] = useState(() =>
+    convexUrl ? new ConvexReactClient(convexUrl) : null
+  );
+
+  if (!convexUrl || !convex) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+        <h2 className="text-2xl font-semibold">Configuration Error</h2>
+        <p className="text-sm text-gray-500">
+          <code>NEXT_PUBLIC_CONVEX_URL</code> is not set. Please configure your
+          environment variables and restart the server.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>

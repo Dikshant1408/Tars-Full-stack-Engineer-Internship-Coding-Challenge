@@ -11,11 +11,36 @@ export const metadata: Metadata = {
   description: "Real-time one-on-one chat application",
 };
 
+const REQUIRED_ENV_VARS = [
+  "NEXT_PUBLIC_CONVEX_URL",
+  "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+] as const;
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const missing = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
+
+  if (missing.length > 0) {
+    return (
+      <html lang="en">
+        <body>
+          <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+            <h2 className="text-2xl font-semibold">Configuration Error</h2>
+            <p className="text-sm text-gray-500">
+              Missing required environment variable
+              {missing.length > 1 ? "s" : ""}: <code>{missing.join(", ")}</code>
+              . Please set {missing.length > 1 ? "them" : "it"} in your{" "}
+              <code>.env.local</code> file and restart the server.
+            </p>
+          </div>
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en">
       <body className="font-sans">
