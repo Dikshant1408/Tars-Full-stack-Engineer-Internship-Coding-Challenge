@@ -19,7 +19,7 @@ export function SyncUserWithConvex() {
       lastName: user.lastName ?? undefined,
       imageUrl: user.imageUrl ?? undefined,
       username: user.username ?? undefined,
-    }).catch(console.error);
+    }).catch((err) => console.error("Failed to sync user with Convex:", err));
   }, [isLoaded, user, upsertUser]);
 
   return null;
