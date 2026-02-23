@@ -3,8 +3,8 @@
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { ConversationSidebar } from "./conversation-sidebar";
-import { MessagePanel } from "./message-panel";
+import { ChatSidebar } from "./ChatSidebar";
+import { ChatWindow } from "./ChatWindow";
 import { Id } from "../../../convex/_generated/dataModel";
 import { APP_NAME } from "@/lib/constants";
 
@@ -29,13 +29,13 @@ export function ChatLayout({ conversationId }: ChatLayoutProps) {
 
   return (
     <div className="flex h-screen bg-background">
-      <ConversationSidebar
+      <ChatSidebar
         currentUser={currentUser}
         activeConversationId={conversationId as Id<"conversations"> | undefined}
       />
       <div className="flex flex-1 flex-col">
         {conversationId ? (
-          <MessagePanel
+          <ChatWindow
             conversationId={conversationId as Id<"conversations">}
             currentUser={currentUser}
           />
