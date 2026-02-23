@@ -32,8 +32,10 @@ export default function RootLayout({
             <p className="text-sm text-gray-500">
               Missing required environment variable
               {missing.length > 1 ? "s" : ""}: <code>{missing.join(", ")}</code>
-              . Please set {missing.length > 1 ? "them" : "it"} in your{" "}
-              <code>.env.local</code> file and restart the server.
+              . Copy <code>.env.local.example</code> to{" "}
+              <code>.env.local</code>, fill in your Convex and Clerk
+              credentials, then restart the server. See the{" "}
+              <code>README.md</code> for detailed setup instructions.
             </p>
           </div>
         </body>
