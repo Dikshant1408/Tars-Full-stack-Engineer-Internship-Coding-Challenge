@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id, Doc } from "../../../convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import { MessageSquare, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
 import { useState } from "react";
+import { UserList } from "@/components/UserList";
 
 interface ConversationSidebarProps {
   currentUser: Doc<"users">;
@@ -28,20 +29,6 @@ export function ConversationSidebar({
   const conversations = useQuery(api.conversations.listForUser, {
     userId: currentUser._id,
   });
-
-  const allUsers = useQuery(api.users.getAllExcept, {
-    clerkId: currentUser.clerkId,
-  });
-
-  const getOrCreate = useMutation(api.conversations.getOrCreate);
-
-  const handleStartConversation = async (otherUser: Doc<"users">) => {
-    const convId = await getOrCreate({
-      currentUserId: currentUser._id,
-      otherUserId: otherUser._id,
-    });
-    router.push(`/chat/${convId}`);
-  };
 
   const displayName = (u: Doc<"users">) => u.name || u.email;
 
@@ -129,36 +116,7 @@ export function ConversationSidebar({
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-0.5 p-2">
-            {allUsers === undefined ? (
-              <p className="p-3 text-sm text-muted-foreground">Loading...</p>
-            ) : allUsers.length === 0 ? (
-              <p className="p-3 text-sm text-muted-foreground">
-                No other users yet.
-              </p>
-            ) : (
-              allUsers.map((u) => (
-                <button
-                  key={u._id}
-                  onClick={() => handleStartConversation(u)}
-                  className="flex w-full items-center gap-3 rounded-md p-3 text-left transition-colors hover:bg-accent"
-                >
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={u.imageUrl} />
-                    <AvatarFallback>{initials(u)}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">
-                      {displayName(u)}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {u.email}
-                    </p>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
+          <UserList currentUser={currentUser} />
         )}
       </ScrollArea>
     </div>
