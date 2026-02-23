@@ -1,9 +1,10 @@
 import { ChatLayout } from "@/components/chat/chat-layout";
 
-export default function ConversationPage({
+export default async function ConversationPage({
   params,
 }: {
-  params: { conversationId: string };
+  params: Promise<{ conversationId: string }>;
 }) {
-  return <ChatLayout conversationId={params.conversationId} />;
+  const { conversationId } = await params;
+  return <ChatLayout conversationId={conversationId} />;
 }
