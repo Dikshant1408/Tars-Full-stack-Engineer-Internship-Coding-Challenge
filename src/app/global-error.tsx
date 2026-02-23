@@ -13,7 +13,10 @@ export default function GlobalError({
         <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
           <h2 className="text-2xl font-semibold">Something went wrong</h2>
           <p className="text-sm text-gray-500">
-            {error.digest ? `Error ID: ${error.digest}` : "An unexpected error occurred."}{" "}
+            {error.message ||
+              (error.digest
+                ? `Error ID: ${error.digest}`
+                : "An unexpected error occurred.")}{" "}
             Please check your environment configuration and try again.
           </p>
           <button
