@@ -6,6 +6,7 @@ import { api } from "../../../convex/_generated/api";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { MessagePanel } from "./message-panel";
 import { Id } from "../../../convex/_generated/dataModel";
+import { APP_NAME } from "@/lib/constants";
 
 interface ChatLayoutProps {
   conversationId?: string;
@@ -41,7 +42,7 @@ export function ChatLayout({ conversationId }: ChatLayoutProps) {
         ) : (
           <div className="flex flex-1 items-center justify-center text-muted-foreground">
             <div className="text-center">
-              <p className="text-xl font-semibold">Welcome to Tars Chat</p>
+              <p className="text-xl font-semibold">Welcome to {APP_NAME}</p>
               <p className="mt-2 text-sm">
                 Select a conversation or start a new one
               </p>

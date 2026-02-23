@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { APP_NAME } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Tars Chat",
+  title: APP_NAME,
   description: "Real-time one-on-one chat application",
 };
 

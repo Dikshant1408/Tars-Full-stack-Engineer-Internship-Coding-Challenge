@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { MessageSquare, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { APP_NAME } from "@/lib/constants";
 import { useState } from "react";
 
 interface ConversationSidebarProps {
@@ -58,7 +59,7 @@ export function ConversationSidebar({
     <div className="flex w-72 flex-col border-r bg-card">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <h1 className="text-lg font-bold">Tars Chat</h1>
+        <h1 className="text-lg font-bold">{APP_NAME}</h1>
         <UserButton afterSignOutUrl="/sign-in" />
       </div>
 
